@@ -83,7 +83,7 @@ function getNextFriday(date) {
     diff = 7 - weekDay + 5;
   }
 
-  date.setDate(date.getDate() + diff);
+  date.setUTCDate(date.getUTCDate() + diff);
 
   return date;
 }
@@ -203,9 +203,9 @@ function getCountWeekendsInMonth(month, year) {
 
   for (let i = 0; i < daysInMonth; i += 1) {
     const copy = new Date(date);
-    copy.setDate(copy.getDate() + i);
+    copy.setUTCDate(copy.getUTCDate() + i);
 
-    if (copy.getDay() === 6 || copy.getDay() === 0) counter += 1;
+    if (copy.getUTCDay() === 6 || copy.getUTCDay() === 0) counter += 1;
   }
 
   return counter;
@@ -256,14 +256,14 @@ function getWeekNumberByDate(date) {
  */
 function getNextFridayThe13th(date) {
   const copy = new Date(date);
-  let monthCounter = copy.getMonth();
+  let monthCounter = copy.getUTCMonth();
   let found;
 
   while (typeof monthCounter === 'number') {
     const localCopy = new Date(copy);
-    localCopy.setMonth(monthCounter, 13);
+    localCopy.setUTCMonth(monthCounter, 13);
 
-    if (localCopy.getDay() === 5) {
+    if (localCopy.getUTCDay() === 5) {
       found = localCopy;
       break;
     }
@@ -286,7 +286,7 @@ function getNextFridayThe13th(date) {
  * Date(2024, 10, 10) => 4
  */
 function getQuarter(date) {
-  const month = date.getMonth() + 1;
+  const month = date.getUTCMonth() + 1;
 
   return Math.ceil(month / 3);
 }
@@ -355,7 +355,7 @@ function getWorkSchedule(period, countWorkDays, countOffDays) {
  * Date(2020, 2, 1) => true
  */
 function isLeapYear(date) {
-  const year = date.getFullYear();
+  const year = date.getUTCFullYear();
 
   if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
     return true;
