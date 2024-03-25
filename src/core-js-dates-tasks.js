@@ -101,7 +101,7 @@ function getNextFriday(date) {
  */
 function getCountDaysInMonth(month, year) {
   const date = new Date(year, month - 1);
-  const copy = new Date(date.getTime());
+  const copy = new Date(date);
   copy.setMonth(date.getMonth() + 1);
   const diff = (copy - date) / 1000 / 60 / 60 / 24;
 
@@ -202,7 +202,7 @@ function getCountWeekendsInMonth(month, year) {
   let counter = 0;
 
   for (let i = 0; i < daysInMonth; i += 1) {
-    const copy = new Date(date.getTime());
+    const copy = new Date(date);
     copy.setDate(copy.getDate() + i);
 
     if (copy.getDay() === 6 || copy.getDay() === 0) counter += 1;
@@ -224,8 +224,23 @@ function getCountWeekendsInMonth(month, year) {
  * Date(2024, 0, 31) => 5
  * Date(2024, 1, 23) => 8
  */
-function getWeekNumberByDate(/* date */) {
-  throw new Error('Not implemented');
+function getWeekNumberByDate(date) {
+  const yearStart = new Date(date);
+  yearStart.setMonth(0, 1);
+
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const diffInDays = Math.floor((date - yearStart) / msPerDay);
+
+  let shift = 0;
+  if (yearStart.getDay() !== 1 && yearStart.getDay() !== 0) {
+    shift = yearStart.getDay() - 1;
+  } else if (yearStart.getDay() === 0) {
+    shift = 6;
+  }
+
+  const weekNo = Math.ceil((diffInDays + shift + 1) / 7);
+
+  return weekNo;
 }
 
 /**
@@ -239,8 +254,24 @@ function getWeekNumberByDate(/* date */) {
  * Date(2024, 0, 13) => Date(2024, 8, 13)
  * Date(2023, 1, 1) => Date(2023, 9, 13)
  */
-function getNextFridayThe13th(/* date */) {
-  throw new Error('Not implemented');
+function getNextFridayThe13th(date) {
+  const copy = new Date(date);
+  let monthCounter = copy.getMonth();
+  let found;
+
+  while (typeof monthCounter === 'number') {
+    const localCopy = new Date(copy);
+    localCopy.setMonth(monthCounter, 13);
+
+    if (localCopy.getDay() === 5) {
+      found = localCopy;
+      break;
+    }
+
+    monthCounter += 1;
+  }
+
+  return found;
 }
 
 /**
@@ -254,8 +285,10 @@ function getNextFridayThe13th(/* date */) {
  * Date(2024, 5, 1) => 2
  * Date(2024, 10, 10) => 4
  */
-function getQuarter(/* date */) {
-  throw new Error('Not implemented');
+function getQuarter(date) {
+  const month = date.getMonth() + 1;
+
+  return Math.ceil(month / 3);
 }
 
 /**
@@ -276,8 +309,37 @@ function getQuarter(/* date */) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  const [startDay, startMonth, startYear] = period.start.split('-');
+  const startDate = new Date(startYear, startMonth - 1, startDay);
+
+  const [endDay, endMonth, endYear] = period.end.split('-');
+  const endDate = new Date(endYear, endMonth - 1, endDay);
+  const startDateCopy = new Date(startDate);
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const diff = Math.floor((endDate - startDate) / msPerDay);
+
+  const workDaysArr = [];
+  let interimDateCounter = 0;
+
+  while (interimDateCounter <= diff) {
+    for (let j = 0; j < countWorkDays; j += 1) {
+      const localCopy = new Date(startDateCopy);
+      localCopy.setDate(localCopy.getDate() + interimDateCounter);
+
+      const date = localCopy.getDate();
+      const month = localCopy.getMonth() + 1;
+      const formatted = `${date < 10 ? `0${date}` : date}-${month < 10 ? `0${month}` : month}-${localCopy.getFullYear()}`;
+      workDaysArr.push(formatted);
+
+      interimDateCounter += 1;
+      if (interimDateCounter > diff) break;
+    }
+
+    interimDateCounter += countOffDays;
+  }
+
+  return workDaysArr;
 }
 
 /**
@@ -292,8 +354,14 @@ function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
  * Date(2022, 2, 1) => false
  * Date(2020, 2, 1) => true
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+function isLeapYear(date) {
+  const year = date.getFullYear();
+
+  if ((year % 4 === 0 && year % 100 !== 0) || year % 400 === 0) {
+    return true;
+  }
+
+  return false;
 }
 
 module.exports = {
