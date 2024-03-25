@@ -102,7 +102,7 @@ function getNextFriday(date) {
 function getCountDaysInMonth(month, year) {
   const date = new Date(year, month - 1);
   const copy = new Date(date);
-  copy.setMonth(date.getMonth() + 1);
+  copy.setUTCMonth(date.getUTCMonth() + 1);
   const diff = (copy - date) / 1000 / 60 / 60 / 24;
 
   return diff;
@@ -226,15 +226,15 @@ function getCountWeekendsInMonth(month, year) {
  */
 function getWeekNumberByDate(date) {
   const yearStart = new Date(date);
-  yearStart.setMonth(0, 1);
+  yearStart.setUTCMonth(0, 1);
 
   const msPerDay = 1000 * 60 * 60 * 24;
   const diffInDays = Math.floor((date - yearStart) / msPerDay);
 
   let shift = 0;
-  if (yearStart.getDay() !== 1 && yearStart.getDay() !== 0) {
-    shift = yearStart.getDay() - 1;
-  } else if (yearStart.getDay() === 0) {
+  if (yearStart.getUTCDay() !== 1 && yearStart.getUTCDay() !== 0) {
+    shift = yearStart.getUTCDay() - 1;
+  } else if (yearStart.getUTCDay() === 0) {
     shift = 6;
   }
 
@@ -317,7 +317,7 @@ function getWorkSchedule(period, countWorkDays, countOffDays) {
   const endDate = new Date(endYear, endMonth - 1, endDay);
   const startDateCopy = new Date(startDate);
   const msPerDay = 1000 * 60 * 60 * 24;
-  const diff = Math.floor((endDate - startDate) / msPerDay);
+  const diff = Math.ceil((endDate - startDate) / msPerDay);
 
   const workDaysArr = [];
   let interimDateCounter = 0;
@@ -325,11 +325,11 @@ function getWorkSchedule(period, countWorkDays, countOffDays) {
   while (interimDateCounter <= diff) {
     for (let j = 0; j < countWorkDays; j += 1) {
       const localCopy = new Date(startDateCopy);
-      localCopy.setDate(localCopy.getDate() + interimDateCounter);
+      localCopy.setUTCDate(localCopy.getUTCDate() + interimDateCounter);
 
-      const date = localCopy.getDate();
-      const month = localCopy.getMonth() + 1;
-      const formatted = `${date < 10 ? `0${date}` : date}-${month < 10 ? `0${month}` : month}-${localCopy.getFullYear()}`;
+      const date = localCopy.getUTCDate();
+      const month = localCopy.getUTCMonth() + 1;
+      const formatted = `${date < 10 ? `0${date}` : date}-${month < 10 ? `0${month}` : month}-${localCopy.getUTCFullYear()}`;
       workDaysArr.push(formatted);
 
       interimDateCounter += 1;
