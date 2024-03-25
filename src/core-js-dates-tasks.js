@@ -102,8 +102,8 @@ function getNextFriday(date) {
 function getCountDaysInMonth(month, year) {
   const date = new Date(year, month - 1);
   const copy = new Date(date);
-  copy.setUTCMonth(date.getUTCMonth() + 1);
-  const diff = (copy - date) / 1000 / 60 / 60 / 24;
+  copy.setMonth(date.getMonth() + 1);
+  const diff = Math.floor((copy - date) / 1000 / 60 / 60 / 24);
 
   return diff;
 }
@@ -203,9 +203,9 @@ function getCountWeekendsInMonth(month, year) {
 
   for (let i = 0; i < daysInMonth; i += 1) {
     const copy = new Date(date);
-    copy.setUTCDate(copy.getUTCDate() + i);
+    copy.setDate(copy.getDate() + i);
 
-    if (copy.getUTCDay() === 6 || copy.getUTCDay() === 0) counter += 1;
+    if (copy.getDay() === 6 || copy.getDay() === 0) counter += 1;
   }
 
   return counter;
@@ -226,15 +226,15 @@ function getCountWeekendsInMonth(month, year) {
  */
 function getWeekNumberByDate(date) {
   const yearStart = new Date(date);
-  yearStart.setUTCMonth(0, 1);
+  yearStart.setMonth(0, 1);
 
   const msPerDay = 1000 * 60 * 60 * 24;
   const diffInDays = Math.floor((date - yearStart) / msPerDay);
 
   let shift = 0;
-  if (yearStart.getUTCDay() !== 1 && yearStart.getUTCDay() !== 0) {
-    shift = yearStart.getUTCDay() - 1;
-  } else if (yearStart.getUTCDay() === 0) {
+  if (yearStart.getDay() !== 1 && yearStart.getDay() !== 0) {
+    shift = yearStart.getDay() - 1;
+  } else if (yearStart.getDay() === 0) {
     shift = 6;
   }
 
@@ -256,14 +256,14 @@ function getWeekNumberByDate(date) {
  */
 function getNextFridayThe13th(date) {
   const copy = new Date(date);
-  let monthCounter = copy.getUTCMonth();
+  let monthCounter = copy.getMonth();
   let found;
 
   while (typeof monthCounter === 'number') {
     const localCopy = new Date(copy);
-    localCopy.setUTCMonth(monthCounter, 13);
+    localCopy.setMonth(monthCounter, 13);
 
-    if (localCopy.getUTCDay() === 5) {
+    if (localCopy.getDay() === 5) {
       found = localCopy;
       break;
     }
@@ -325,11 +325,11 @@ function getWorkSchedule(period, countWorkDays, countOffDays) {
   while (interimDateCounter <= diff) {
     for (let j = 0; j < countWorkDays; j += 1) {
       const localCopy = new Date(startDateCopy);
-      localCopy.setUTCDate(localCopy.getUTCDate() + interimDateCounter);
+      localCopy.setDate(localCopy.getDate() + interimDateCounter);
 
-      const date = localCopy.getUTCDate();
-      const month = localCopy.getUTCMonth() + 1;
-      const formatted = `${date < 10 ? `0${date}` : date}-${month < 10 ? `0${month}` : month}-${localCopy.getUTCFullYear()}`;
+      const date = localCopy.getDate();
+      const month = localCopy.getMonth() + 1;
+      const formatted = `${date < 10 ? `0${date}` : date}-${month < 10 ? `0${month}` : month}-${localCopy.getFullYear()}`;
       workDaysArr.push(formatted);
 
       interimDateCounter += 1;
